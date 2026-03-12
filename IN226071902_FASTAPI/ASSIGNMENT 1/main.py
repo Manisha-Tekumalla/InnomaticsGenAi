@@ -185,3 +185,64 @@ def place_bulk_order(order: BulkOrder):
         "failed_orders": failed,
         "grand_total": total_price
     }
+
+# Product Model
+class Product(BaseModel):
+    name: str
+    price: int
+    category: str
+    in_stock: bool
+
+
+# POST - Add Product
+@app.post("/products")
+def add_product(product: Product):
+
+    new_id = len(products) + 1
+
+    new_product = {
+        "id": new_id,
+        "name": product.name,
+        "price": product.price,
+        "category": product.category,
+        "in_stock": product.in_stock
+    }
+
+    products.append(new_product)
+
+    return {"message": "Product added successfully", "product": new_product}
+
+
+# GET - Single Product
+@app.get("/products/{product_id}")
+def get_product(product_id: int):
+
+    for product in products:
+        if product["id"] == product_id:
+            return product
+
+    return {"error": "Product not found"}
+
+
+# PUT - Update Product Price
+@app.put("/products/{product_id}")
+def update_product(product_id: int, price: int):
+
+    for product in products:
+        if product["id"] == product_id:
+            product["price"] = price
+            return {"message": "Product updated", "product": product}
+
+    return {"error": "Product not found"}
+
+
+# DELETE - Remove Product
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int):
+
+    for product in products:
+        if product["id"] == product_id:
+            products.remove(product)
+            return {"message": f"Product {product_id} deleted"}
+
+    return {"error": "Product not found"}
